@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="When Reasoning Helps Action: Monitoring and Steering Chain-of-Thought in Vision-Language-Action Policies">
+  <meta name="keywords" content="LLMs, AI Safety, Reachability Analysis">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When Reasoning Helps Action: Monitoring and Steering Chain-of-Thought in Vision-Language-Action Policies
+  </title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+
+<body>
+
+  <style>
+    :root {
+      --trust-green: #228B22;
+    }
+
+    .video-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      /* Keeps alignment consistent */
+      gap: 20px;
+    }
+
+    .video-container .video-box {
+      flex: 1 1 45%;
+      /* Ensures side-by-side layout */
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .video-box video {
+      width: 80%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .video-box p {
+      width: 80%;
+      /* Makes text match video width */
+      margin: 5px auto;
+      /* Centers text */
+      text-align: center;
+      display: block;
+    }
+
+    .trust {
+      color: var(--trust-green);
+      font-weight: bold;
+    }
+
+    .container.is-max-desktop.is-wide {
+      max-width: 1040px;
+    }
+
+    /* border keeps the video's white title card from blending into the page */
+    .paper-video {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid #dbdbdb;
+      border-radius: 6px;
+    }
+
+    .container.is-max-desktop.is-figure-wide {
+      max-width: 1200px;
+    }
+
+    /* Column ratio is a compromise between equal main-image heights (1.296fr) and equal title text size
+       (1.152fr; source title height is 34px in the 1464px-wide fig. 1a vs 31px in the 1159px-wide fig. 1b) */
+    .intro-figures {
+      display: grid;
+      grid-template-columns: 1.23fr 1fr;
+      column-gap: 24px;
+    }
+
+    /* subgrid puts main images, reasoning images, and captions in shared rows, so each row stays aligned */
+    .intro-figures figure {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      row-gap: 0;
+      min-width: 0;
+      margin: 0;
+    }
+
+    .intro-figures img {
+      width: 100%;
+      display: block;
+    }
+
+    .intro-figures .reasoning {
+      margin-top: 0.75rem;
+    }
+
+    /* Matches the reasoning text size across panels (source line pitch: 48px in the 1507px-wide 1a image,
+       42px in the 1194px-wide 1b image): (1507/48) / (1194/42) / 1.23 = 89.8% of the column */
+    .intro-figures figure:first-child .reasoning {
+      width: 89.8%;
+    }
+
+    .intro-figures figcaption {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    @media screen and (max-width: 768px) {
+      .intro-figures {
+        grid-template-columns: 1fr;
+        row-gap: 2rem;
+      }
+
+      .intro-figures figure:first-child .reasoning {
+        width: 100%;
+      }
+    }
+  </style>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">When Reasoning Helps Action: Monitoring and Steering Chain-of-Thought in Vision-Language-Action Policies</h1>
+            <div class="is-size-4 publication-authors">
+              <span class="author-block">
+                Sathwik Karnik<sup>*</sup>,
+              </span>
+              <span class="author-block">
+                Joseph JR. Lee<sup>*</sup>,
+              </span>
+              <span class="author-block">
+                Aryaman Gupta,
+              </span>
+              <span class="author-block">
+                Somil Bansal
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Safe and Intelligent Autonomy Lab, Stanford University</span>
+            </div>
+
+            <!-- Publication Links -->
+            <div class="column has-text-centered">
+              <div class="publication-links"
+                style="display: flex; justify-content: center; gap: 20px; align-items: flex-start;">
+
+                <!-- Paper Link -->
+                <div style="text-align: center;">
+                  <a class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </div>
+
+                <!-- arXiv Link -->
+                <div style="text-align: center;">
+                  <a class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </div>
+
+                <!-- Code Link with "Coming Soon" -->
+                <div style="text-align: center;">
+                  <span class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </span>
+                  <div style="margin-top: 6px; font-size: 0.85em; color: #777;">
+                    <em>Coming Soon</em>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- /Publication Links -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="margin-top: -5rem;">
+    <div class="container is-max-desktop is-wide">
+      <!-- Abstract -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-five-sixths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Reasoning-enabled VLA policies expose chain-of-thought (CoT) traces that appear to explain and guide their actions, creating a potential interface for runtime safety through reasoning monitoring and correction. In this work, we define and operationalize two evaluation axes for assessing when this interface can improve embodied behavior: <i>correctability</i>, which measures whether unreliable reasoning can be detected and improved during generation, and <i>actionability</i>, which measures whether reasoning corrections produce behaviorally meaningful changes in the intended direction. To enable correctability, we introduce <b>T</b>oken-level <b>R</b>eward for <b>U</b>tility-<b>S</b>teered Chain-of-<b>T</b>hought (<span class="trust">TRUST</span>), an offline-trained value model that predicts eventual reasoning correctness from partial prefixes and uses these estimates to monitor and selectively steer reasoning generation in frozen VLA policies. On the Alpamayo 1.5 driving VLA, <span class="trust">TRUST</span> monitors correctness with 88.9% accuracy and improves reasoning correctness from 75.9% to 90.0%. On a baseline-defined challenging subset in AlpaSim, <span class="trust">TRUST</span> reduces collision rate by 30.4% and maximum trajectory error by 11.5% relative to the unsteered policy, outperforming a compute-matched Best-of-4 baseline. On the DeepThinkVLA manipulation VLA, <span class="trust">TRUST</span> improves the correctness of grasp-state claims from 69.3% to 90.2% and action-choice claims from 68.8% to 85.9%, yet closed-loop task performance on LIBERO-Plus remains largely unchanged. Empirical analysis reveals intent-consistent behavioral effects in Alpamayo 1.5 but limited effects in DeepThinkVLA, helping interpret these different task-level outcomes. Together, our results show that gains in reasoning correctness do not automatically imply gains in embodied performance, motivating evaluation of correctability and actionability when using CoT as a runtime safety interface.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract -->
+
+      <!-- Video -->
+      <div class="has-text-centered" style="margin-top: 2rem;">
+        <video class="paper-video" controls playsinline preload="metadata"
+          poster="./static/images/video_poster.jpg">
+          <source src="./static/final_icra_video.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <!--/ Video -->
+    </div>
+  </section>
+
+
+
+  <section class="section" style="margin-top: -4rem;">
+    <div class="container is-max-desktop is-wide">
+      <div class="box" style="background:#f9f9f9; border-left: 5px solid var(--trust-green);">
+        <h2 class="title is-4">Key Findings</h2>
+        <ol style="margin-top:0.8rem; font-size:1rem; line-height:1.8; list-style:none; padding-left:0;">
+          <li style="margin-bottom:0.7rem; display:flex; align-items:flex-start;">
+            <span
+              style="flex-shrink:0; display:inline-block; width:26px; height:26px; line-height:26px; border-radius:50%; background:var(--trust-green); color:#fff; text-align:center; font-weight:bold; margin-right:10px;">
+              1
+            </span>
+            <span>In reasoning-based VLA policies, CoT provides an appealing interface for runtime safety.</span>
+          </li>
+          <li style="margin-bottom:0.7rem; display:flex; align-items:flex-start;">
+            <span
+              style="flex-shrink:0; display:inline-block; width:26px; height:26px; line-height:26px; border-radius:50%; background:var(--trust-green); color:#fff; text-align:center; font-weight:bold; margin-right:10px;">
+              2
+            </span>
+            <span>With <span class="trust">TRUST</span>, CoT reasoning tokens can be steered reliably to be more correct.</span>
+          </li>
+          <li style="margin-bottom:0.7rem; display:flex; align-items:flex-start;">
+            <span
+              style="flex-shrink:0; display:inline-block; width:26px; height:26px; line-height:26px; border-radius:50%; background:var(--trust-green); color:#fff; text-align:center; font-weight:bold; margin-right:10px;">
+              3
+            </span>
+            <span>Reasoning <i>correctability</i> does not always imply <i>actionability</i>.</span>
+          </li>
+          <li style="margin-bottom:0.7rem; display:flex; align-items:flex-start;">
+            <span
+              style="flex-shrink:0; display:inline-block; width:26px; height:26px; line-height:26px; border-radius:50%; background:var(--trust-green); color:#fff; text-align:center; font-weight:bold; margin-right:10px;">
+              4
+            </span>
+            <span>Reasoning correctability and actionability should be measured separately.</span>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="margin-top: -3rem;">
+    <div class="container is-max-desktop is-figure-wide">
+      <h2 class="title is-3 has-text-centered">Actionability of Reasoning Corrections</h2>
+      <div class="intro-figures">
+        <figure>
+          <a href="./static/images/intro_figure_1.png" target="_blank">
+            <img src="./static/images/intro_figure_1.png"
+              alt="Alpamayo 1.5 driving example: under unsteered reasoning the vehicle proceeds through the turn; under corrected reasoning it decelerates to a stop at the yellow left-turn arrow." />
+          </a>
+          <img class="reasoning" src="./static/images/intro_figure_1_reasoning_only.png"
+            alt="Unsteered Reasoning: Accelerate to proceed through the intersection since the straight traffic light is green [min ADE = 8.83 m]. Correct Reasoning: Decelerate to a stop at the stop line because the left-turn arrow is yellow [min ADE = 2.02 m]." />
+          <figcaption>(a) Alpamayo 1.5 continues through the turn under its own reasoning but decelerates under the
+            corrected reasoning trace.</figcaption>
+        </figure>
+        <figure>
+          <a href="./static/images/intro_figure_2.png" target="_blank">
+            <img src="./static/images/intro_figure_2.png"
+              alt="DeepThinkVLA manipulation example: correcting a hallucinated grasp claim leaves the gripper-to-object distance and end-effector path nearly unchanged." />
+          </a>
+          <img class="reasoning" src="./static/images/intro_figure_2_reasoning_only.png"
+            alt="Unsteered Reasoning: The robot arm has moved and is now grasping the cream cheese (center-left, in gripper)...Place the cream cheese in the bowl. Correct Reasoning: The cream cheese (blue box, center-left) is now being approached....Pick up the cream cheese and move it above the bowl." />
+          <figcaption>(b) Correcting DeepThinkVLA's mistaken <span style="white-space: nowrap;">grasp-state</span> claim and associated action intent produces
+            little change in its action&nbsp;chunk.</figcaption>
+        </figure>
+      </div>
+      <div class="content has-text-justified" style="max-width: 1040px; margin: 1.5rem auto 0;">
+        <p>
+          We substitute scene-consistent reasoning for erroneous reasoning traces and examine whether actions change in
+          the intended direction. These two examples illustrate contrasting behavioral responses to corrected
+          reasoning.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This website borrows the style of the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies
+                website source code</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
